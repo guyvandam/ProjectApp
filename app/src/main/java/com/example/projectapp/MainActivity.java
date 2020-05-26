@@ -3,18 +3,14 @@ package com.example.projectapp;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.os.SystemClock;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,9 +18,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
-import java.net.Socket;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -32,16 +29,18 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class MainActivity extends AppCompatActivity {
     private Chronometer chronometer;
     private boolean running; // is the chronometer running.
-    private EditText ipInput;
-    Button buttonStart, buttonStop, buttonEnter;
+    Button buttonStart, buttonStop;
     MediaRecorder mediaRecorder;
     WavRecorder wavRecorder;
     Random random;
     MsgSender MsgSender;
-    Stringobj str;
+    StringObj str;
 
     public static final int RequestPermissionCode = 1;
 
+    /**
+     * the 'run' function.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,77 +49,8 @@ public class MainActivity extends AppCompatActivity {
         buttonStart = findViewById(R.id.btnRecord);
         buttonStop = findViewById(R.id.btnStop);
         chronometer = findViewById(R.id.chronometer);
-//        ipInput = findViewById(R.id.ipInput);
-//        buttonEnter = findViewById(R.id.enter);
 
         random = new Random();
-
-//        buttonEnter.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String ip = ipInput.getText().toString();
-//                String[] ipNumbers = ip.split(".");
-//                if (ipNumbers.length != 4) {
-//                    ipInput.setText("");
-//                    Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG);
-//                    return;
-//                }
-//                for (String num : ipNumbers) {
-//                    try {
-//                        Integer.parseInt(num);
-//                    } catch (Exception e) {
-//                        ipInput.setText("");
-//                        Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG);
-//                        return;
-//                    }
-//                }
-//            }
-//        });
-
-//        ipInput.setOnKeyListener(new View.OnKeyListener() {
-//            @Override
-//            public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                String ip = ipInput.getText().toString();
-//                String[] ipNumbers = ip.split(".");
-//                int temp;
-//                if (ipNumbers.length != 4) {
-//                    ipInput.setText("");
-//                    Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG);
-//                    return false;
-//                }
-//                for (String num : ipNumbers) {
-//                    try {
-//                        Integer.parseInt(num);
-//                    } catch (Exception e) {
-//                        ipInput.setText("");
-//                        Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG);
-//                    }
-//                    return false;
-//                }
-//                return true;
-//            }
-//        });
-
-//        ipInput.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String ip = ipInput.getText().toString();
-//                String[] ipNumbers = ip.split(".");
-//                int temp;
-//                if (ipNumbers.length != 4) {
-//                    ipInput.setText("");
-//                    Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG);
-//                }
-//                for (String num : ipNumbers) {
-//                    try {
-//                        Integer.parseInt(num);
-//                    } catch (Exception e) {
-//                        ipInput.setText("");
-//                        Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG);
-//                    }
-//                }
-//            }
-//        });
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     *
+     */
     public void MediaRecorderReady() {
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -173,12 +106,18 @@ public class MainActivity extends AppCompatActivity {
         wavRecorder = new WavRecorder(outputFile);
     }
 
-
+    /**
+     * requests permission from the user to access the phone storage and record audio.
+     */
     private void requestPermission() {
         ActivityCompat.requestPermissions(MainActivity.this, new
                 String[]{WRITE_EXTERNAL_STORAGE, RECORD_AUDIO}, RequestPermissionCode);
     }
 
+    /**
+     * an android function as seen by the override, presents whether the permission was granted
+     * with the Toast prints.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -201,11 +140,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @return if the access to the data is possible.
+     */
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
     }
 
+    /**
+     * @return if the permission to record audio is granted.
+     */
     public static boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
 
@@ -213,6 +158,9 @@ public class MainActivity extends AppCompatActivity {
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
+    /**
+     * @return if we have permission to write to users calender data.
+     */
     public static boolean hasPermission(String permission, Context context) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -221,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * @return if we have enough free space to store our temporary wav file.
+     */
     public static boolean hasSufficientFreeSpaceAvailable(String path) {
         StatFs stat = new StatFs(path);
         long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getBlockCount();
@@ -231,6 +182,9 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * @return if we have permission to write to the data and record audio.
+     */
     public boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(getApplicationContext(),
                 WRITE_EXTERNAL_STORAGE);
@@ -240,38 +194,31 @@ public class MainActivity extends AppCompatActivity {
                 result1 == PackageManager.PERMISSION_GRANTED;
     }
 
-    //showing main page after login succeeded
-    public void showMainPage() {
-        buttonStop.setVisibility(View.VISIBLE);
-        buttonStart.setVisibility(View.VISIBLE);
-//        chronometer.setVisibility(View.INVISIBLE);
-        buttonStop.setEnabled(false);
-    }
-
-
+    /**
+     * sends the message to the server followed by the bytes of the wav file.
+     *
+     * @param val
+     */
     public void send(String val) {
         String ans = val;
-        Log.d("", val);
-        str = new Stringobj(ans);
+        str = new StringObj(ans);
         MsgSender = new MsgSender(str);
         try {
-            MsgSender.execute(ans).get();
+            MsgSender.execute(ans).get(10000, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-
+        } catch (TimeoutException e) {
+            Toast.makeText(MainActivity.this, "something is wrong with the network ",
+                    Toast.LENGTH_LONG).show();
         }
-        Log.d("state:", String.valueOf(MsgSender.getStatus()));
-
-        if (str.getStr().equals("success") || str.getStr().equals("found")) {
-            showMainPage();
-        } else {
-            Toast.makeText(MainActivity.this, str.getStr(), Toast.LENGTH_LONG).show();
-
-        }
+        Toast.makeText(MainActivity.this, str.getStr(), Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * start the chronometer, our 'stopwatch'
+     */
     public void startChronometer(View v) {
         if (!running) {
             chronometer.setBase(SystemClock.elapsedRealtime());
@@ -280,6 +227,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * stops and resets the chronometer, our 'stopwatch'
+     */
     public void pauseChronometer(View v) {
         if (running) {
             chronometer.setBase(SystemClock.elapsedRealtime());

@@ -1,9 +1,9 @@
 package com.example.projectapp;
 
-class Stringobj {
+class StringObj {
     private String str;
 
-    public Stringobj(String string) {
+    public StringObj(String string) {
         this.str = string;
     }
 

@@ -7,28 +7,14 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-<!--    <TextView-->
-<!--        android:id="@+id/text"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="please enter ip:"-->
-<!--        android:textSize="15sp" />-->
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="350dp"
+        android:text="Please record between 10-15 seconds for the most accurate result.."
+        android:textSize="20sp" />
 
-
-<!--    <EditText-->
-<!--        android:id="@+id/ipInput"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:width="150dp"-->
-<!--        android:digits="0123456789."-->
-<!--        android:inputType="number|numberDecimal"-->
-<!--        android:maxLength="15" />-->
-
-<!--    <Button-->
-<!--        android:id="@+id/enter"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="enter" />-->
 
     <Chronometer
         android:id="@+id/chronometer"
@@ -37,6 +23,15 @@
         android:layout_marginTop="40dp"
         android:layout_marginBottom="300dp"
         android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="350dp"
+        android:text="The song name will appear on the button of the screen.."
+        android:layout_marginBottom="30dp"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/btnRecord"
