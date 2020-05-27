@@ -8,11 +8,43 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/ipInputText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="350dp"
+        android:text="please enter the IP address and the Port of the network you're connected to."
+        android:textSize="19sp" />
+
+
+    <EditText
+        android:id="@+id/ipInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="150dp"
+        android:digits="0123456789."
+        android:hint="IP"
+        android:imeOptions="actionNext"
+        android:inputType="numberDecimal"
+        android:maxLength="15" />
+
+    <EditText
+        android:id="@+id/portInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:width="70dp"
+        android:digits="0123456789"
+        android:hint="Port"
+        android:imeOptions="actionDone"
+        android:inputType="numberDecimal"
+        android:maxLength="5" />
+
+    <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:width="350dp"
-        android:text="Please record between 10-15 seconds for the most accurate result.."
+        android:text="record between 10-15 seconds for the most accurate result.."
         android:textSize="20sp" />
 
 
@@ -21,16 +53,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginBottom="300dp"
+        android:layout_marginBottom="100dp"
         android:textSize="30sp" />
 
     <TextView
         android:id="@+id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:width="350dp"
         android:text="The song name will appear on the button of the screen.."
-        android:layout_marginBottom="30dp"
         android:textSize="20sp" />
 
     <Button

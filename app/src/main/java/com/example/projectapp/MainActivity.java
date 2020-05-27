@@ -8,9 +8,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.os.SystemClock;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,12 +36,16 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class MainActivity extends AppCompatActivity {
     private Chronometer chronometer;
     private boolean running; // is the chronometer running.
-    Button buttonStart, buttonStop;
+    private EditText ipInput, portInput;
+    Button buttonStart, buttonStop, enterButton;
     MediaRecorder mediaRecorder;
     WavRecorder wavRecorder;
     Random random;
     MsgSender MsgSender;
     StringObj str;
+    private SocketInfo socketInfo = new SocketInfo("", -1);
+    private boolean isValidIP = false;
+
 
     public static final int RequestPermissionCode = 1;
 
@@ -49,8 +60,16 @@ public class MainActivity extends AppCompatActivity {
         buttonStart = findViewById(R.id.btnRecord);
         buttonStop = findViewById(R.id.btnStop);
         chronometer = findViewById(R.id.chronometer);
+        ipInput = findViewById(R.id.ipInput);
+        portInput = findViewById(R.id.portInput);
 
         random = new Random();
+
+        ipInput.setOnEditorActionListener(editorActionListener);
+        portInput.setOnEditorActionListener(editorActionListener);
+
+        buttonStart.setEnabled(false);
+        buttonStop.setEnabled(false);
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +104,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private TextView.OnEditorActionListener editorActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            switch (actionId) {
+                case EditorInfo.IME_ACTION_NEXT:
+                    isIpValid();
+                    break;
+                case EditorInfo.IME_ACTION_DONE:
+                    isPortValid();
+                    break;
+            }
+            return false;
+        }
+    };
 
     /**
      *
@@ -202,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     public void send(String val) {
         String ans = val;
         str = new StringObj(ans);
-        MsgSender = new MsgSender(str);
+        MsgSender = new MsgSender(str, socketInfo);
         try {
             MsgSender.execute(ans).get(10000, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
@@ -210,10 +244,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (TimeoutException e) {
-            Toast.makeText(MainActivity.this, "something is wrong with the network ",
+            Toast.makeText(MainActivity.this, "something is wrong with the network, " +
+                            "try a different IP address or a different port...",
                     Toast.LENGTH_LONG).show();
         }
-        Toast.makeText(MainActivity.this, str.getStr(), Toast.LENGTH_LONG).show();
+        if (!str.getStr().equals("file")) {
+            Toast.makeText(MainActivity.this, str.getStr(), Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -237,4 +274,63 @@ public class MainActivity extends AppCompatActivity {
             running = false;
         }
     }
+
+    public void isIpValid() {
+        String ipText = ipInput.getText().toString();
+        String[] ipNumbers = ipText.split("\\.");
+        if (ipNumbers.length != 4) {
+            Toast.makeText(MainActivity.this, "invalid ip", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        for (String s : ipNumbers) {
+            try {
+                int temp = Integer.parseInt(s);
+                if (temp >= 256) {
+                    Toast.makeText(MainActivity.this, "invalid ip ", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, "invalid ip ", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+        }
+        Toast.makeText(MainActivity.this, "ip is valid",
+                Toast.LENGTH_LONG).show();
+
+        socketInfo.setIp(ipText);
+        isValidIP = true;
+        return;
+    }
+
+    public void isPortValid() {
+        if (!isValidIP) {
+            Toast.makeText(MainActivity.this, "enter valid ip first",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            int port = Integer.parseInt(portInput.getText().toString());
+            if (port > 65535) {
+                Toast.makeText(MainActivity.this, "invalid port",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            Toast.makeText(MainActivity.this, "everything is ok, connecting to the server",
+                    Toast.LENGTH_LONG).show();
+            socketInfo.setPort(port);
+            portInput.setText("");
+            ipInput.setText("");
+            buttonStart.setEnabled(true);
+            buttonStop.setEnabled(false);
+
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, "invalid port",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+    }
+
+
 }
