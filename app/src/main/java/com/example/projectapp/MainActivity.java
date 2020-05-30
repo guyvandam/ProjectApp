@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer chronometer;
     private boolean running; // is the chronometer running.
     private EditText ipInput, portInput;
-    Button buttonStart, buttonStop, enterButton;
+    Button buttonStart, buttonStop;
     MediaRecorder mediaRecorder;
     WavRecorder wavRecorder;
     Random random;
@@ -275,6 +275,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * checks if the input IP is valid.
+     */
     public void isIpValid() {
         String ipText = ipInput.getText().toString();
         String[] ipNumbers = ipText.split("\\.");
@@ -304,6 +307,9 @@ public class MainActivity extends AppCompatActivity {
         return;
     }
 
+    /**
+     * checks if the input Port is valid.
+     */
     public void isPortValid() {
         if (!isValidIP) {
             Toast.makeText(MainActivity.this, "enter valid ip first",

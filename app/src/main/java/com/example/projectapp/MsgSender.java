@@ -3,8 +3,6 @@ package com.example.projectapp;
 
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -16,12 +14,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-
 import java.nio.file.Files;
 
 public class MsgSender extends AsyncTask<String, SocketInfo, Void> {
     Socket s;
-    //    SocketInfo socketInfo = new SocketInfo("192.168.43.174", 8888);
     SocketInfo socketInfo;
     PrintWriter pw;
     InputStreamReader isr;
@@ -43,9 +39,6 @@ public class MsgSender extends AsyncTask<String, SocketInfo, Void> {
     @Override
     protected Void doInBackground(String... voids) {
         String message = voids[0];
-//        System.out.println("==========================================");
-//        System.out.println("port: " + String.valueOf(socketInfo.getPort()) + "ip: " + socketInfo.getIp());
-//        System.out.println("==========================================");
         try {
 
             try {
